@@ -278,7 +278,15 @@ static int getParameterValues_rbus(rbusObject_t inParams, rbusObject_t outParams
                     rbusObject_SetProperty(outParams,out_prop);
                     free(str_value);
                     rbusProperty_Release(out_prop);
-                    CcspTraceWarning(("%s ParammeterName[%d]-%s, ParameeterValue:%s\n  ",__func__,i, val[i]->parameterName, val[i]->parameterValue));
+		    if(NULL == strstr(val[i]->parameterName, "Passphrase"))
+		    {
+                      CcspTraceWarning(("%s ParammeterName[%d]-%s, ParameeterValue:%s\n  ",__func__,i, val[i]->parameterName, val[i]->parameterValue));
+		    }
+		    else
+		    {
+	              CcspTraceWarning(("%s Not printing the value of parameter ParameterName[%d]-%s as it disclose the confidential information\n",__func__,i, val[i]->parameterName));
+		    }
+
                 }
                 else
                 {
