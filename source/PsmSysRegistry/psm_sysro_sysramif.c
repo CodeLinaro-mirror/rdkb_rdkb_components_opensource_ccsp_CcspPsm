@@ -173,6 +173,12 @@ PsmSysroSysRamNotify
     PPSM_SYS_REGISTRY_OBJECT       pMyObject       = (PPSM_SYS_REGISTRY_OBJECT    )hThisObject;
    // PANSC_TIMER_DESCRIPTOR_OBJECT   pRegTimerObj    = (PANSC_TIMER_DESCRIPTOR_OBJECT)pMyObject->hRegTimerObj;
 //CcspTraceInfo(("\n##PsmSysroSysRamNotify() begins##\n"));
+    /*
+     * MISSING_LOCK - False positive. PsmSysroSysRamNotify is invoked by the sys repository while the
+     * caller holds the SysIra ThreadLock, which also guards the bSaveInProgress/bNeedFlush writes in
+     * PsmSysroRegTimerInvoke. Acquiring AccessLock here would invert lock order (AccessLock -> ThreadLock
+     * in the timer path) and risk deadlock.
+     */
     if ( pMyObject->bNoSave || pMyObject->bSaveInProgress )
     {
         return  ANSC_STATUS_SUCCESS;
