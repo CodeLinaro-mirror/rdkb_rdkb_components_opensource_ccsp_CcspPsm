@@ -1758,7 +1758,10 @@ static ANSC_STATUS FileReadToBuffer (const char *file, char **buf, ULONG *size)
 static void DumpRecord (const PsmRecord_t *rec)
 {
     PsmHalDbg(("  Rec.name   %s\n", rec->name));
-    PsmHalDbg(("  Rec.value  %s\n", rec->value));
+    if (strstr(rec->name, "Passphrase") != NULL)
+        PsmHalDbg(("  Rec.value  <hidden>\n"));
+    else
+        PsmHalDbg(("  Rec.value  %s\n", rec->value));	
 
     switch (rec->type)
     {
@@ -1972,12 +1975,15 @@ static ANSC_STATUS AddRecToXml (const PsmRecord_t *rec, PANSC_XML_DOM_NODE_OBJEC
 {
     PANSC_XML_DOM_NODE_OBJECT node;
 
-    if ((node = xml->AddChildByName(xml, ELEM_RECORD)) == NULL)
+    /* AddChildByName() reuses an existing "Record" child, so build a new node explicitly */
+    if ((node = (PANSC_XML_DOM_NODE_OBJECT)AnscCreateXmlDomNode(NULL)) == NULL)
     {
-        CcspTraceInfo(("AddRecToXml-> node = xml->AddChildByName(xml, ELEM_RECORD) \n"));
+        CcspTraceInfo(("AddRecToXml-> AnscCreateXmlDomNode failed\n"));
         return ANSC_STATUS_FAILURE;
     }
-
+    AnscXmlDomNodeSetName(node, ELEM_RECORD);
+    AnscXmlDomNodeAddChild(xml, node);
+	
     if (RecordSetNode(rec, node) != ANSC_STATUS_SUCCESS)
     {
         xml->DelChild(xml, node);
@@ -2024,8 +2030,9 @@ static ANSC_STATUS XmlToFile (PANSC_XML_DOM_NODE_OBJECT xml, const char *file)
         return ANSC_STATUS_FAILURE;
     }
 
-    if ((pFile = AnscOpenFile((char *)file, 
-                    ANSC_FILE_TYPE_RDWR, ANSC_FILE_TYPE_RDWR)) == NULL)
+    if ((pFile = AnscOpenFile((char *)file,
+                    ANSC_FILE_MODE_CREATE | ANSC_FILE_MODE_WRITE | ANSC_FILE_MODE_TRUNC,
+                    ANSC_FILE_TYPE_RDWR)) == NULL)
     {
         AnscFreeMemory(buf);
         CcspTraceInfo(("XmlToFile -> (pFile=open(ANSC_FILE_TYPE_RDWR, ANSC_FILE_TYPE_RDWR))==NULL\n"));       
