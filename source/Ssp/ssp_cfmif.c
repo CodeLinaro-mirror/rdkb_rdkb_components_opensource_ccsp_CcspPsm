@@ -1759,9 +1759,13 @@ static void DumpRecord (const PsmRecord_t *rec)
 {
     PsmHalDbg(("  Rec.name   %s\n", rec->name));
     if (strstr(rec->name, "Passphrase") != NULL)
+	{
         PsmHalDbg(("  Rec.value  <hidden>\n"));
+	}
     else
-        PsmHalDbg(("  Rec.value  %s\n", rec->value));	
+	{
+        PsmHalDbg(("  Rec.value  %s\n", rec->value));
+	}
 
     switch (rec->type)
     {
