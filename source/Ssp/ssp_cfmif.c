@@ -573,8 +573,7 @@ int merge_missing_Partner_params()
                 CcspTraceInfo(("data pointer is NULL \n"));
                 fclose(fp);
                 return -1;
-            }
-              
+            }         
         }
 
 	/* CID 190396 fix*/
@@ -1967,7 +1966,7 @@ static ANSC_STATUS NodeGetRecord (PANSC_XML_DOM_NODE_OBJECT node, PsmRecord_t *r
     size = sizeof(rec->value) - 1;
     if (node->GetDataString(node, NULL, rec->value, &size) != ANSC_STATUS_SUCCESS)
     {
-        CcspTraceInfo(("NodeGetRecord -> node->GetDataString(node, NULL, rec->value, &size) != ANSC_STATUS_SUCCESS\n"));
+        CcspTraceError(("%s: failed to get value of record '%s'\n", __FUNCTION__, rec->name));
         return ANSC_STATUS_FAILURE;
     }
     rec->value[size] = '\0';
@@ -1982,7 +1981,7 @@ static ANSC_STATUS AddRecToXml (const PsmRecord_t *rec, PANSC_XML_DOM_NODE_OBJEC
     /* AddChildByName() reuses an existing "Record" child, so build a new node explicitly */
     if ((node = (PANSC_XML_DOM_NODE_OBJECT)AnscCreateXmlDomNode(NULL)) == NULL)
     {
-        CcspTraceInfo(("AddRecToXml-> AnscCreateXmlDomNode failed\n"));
+        CcspTraceError(("%s: failed to create XML node for record '%s'\n", __FUNCTION__, rec->name));
         return ANSC_STATUS_FAILURE;
     }
     AnscXmlDomNodeSetName(node, ELEM_RECORD);
@@ -2010,7 +2009,7 @@ static ANSC_STATUS XmlToBuffer (PANSC_XML_DOM_NODE_OBJECT xml, char **buf, ULONG
     {
         if (newBuf)
             AnscFreeMemory(newBuf);
-        CcspTraceInfo(("XmlToBuffer ends->newBuf"));
+        CcspTraceError(("%s: failed to get encoded size, allocate buffer or encode XML\n", __FUNCTION__));
         return ANSC_STATUS_FAILURE;
     }
 
@@ -2027,7 +2026,7 @@ static ANSC_STATUS XmlToFile (PANSC_XML_DOM_NODE_OBJECT xml, const char *file)
 //    CcspTraceInfo(("XmlToFile begins\n"));    
     if (XmlToBuffer(xml, &buf, &size) != ANSC_STATUS_SUCCESS)
     {
-        CcspTraceInfo(("XmlToFile -> XmlToBuffer(xml, &buf, &size) != ANSC_STATUS_SUCCESS\n"));
+        CcspTraceError(("%s: failed to convert XML to buffer for file %s\n", __FUNCTION__, file));
         /*Coverity Fix CID:67400 RESOURCE_LEAK */
         if( buf != NULL)
            AnscFreeMemory(buf);

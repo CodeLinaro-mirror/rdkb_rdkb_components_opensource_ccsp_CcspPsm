@@ -660,7 +660,7 @@ int  getParameterValues(
 
     if ( pSysIraIf == NULL )
     {
-        CcspTraceInfo(("getParameterValues- pSysIraIf is NULL\n"));
+        CcspTraceError(("getParameterValues- pSysIraIf is NULL\n"));
         return CCSP_FAILURE;
     }
 
@@ -1282,7 +1282,7 @@ int getParameterNames(
 
     if ( pSysIraIf == NULL )
     {
-        CcspTraceInfo(("getParameterNames- pSysIraIf is NULL\n"));
+        CcspTraceError(("getParameterNames- pSysIraIf is NULL\n"));
         return CCSP_FAILURE;
     }
 
